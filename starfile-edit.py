@@ -5,8 +5,10 @@
 import sys
 vers = '0.2'
 
+headless = False
 if '--headless' is sys.argv:
     headless = True
+
 
 
 #------- function test if string is a number --------------------------#
@@ -97,6 +99,14 @@ for i in labelslist:
 print "\nWhich columns to edit? Enter a list separated by commas IE: 1,2,4,6"
 toedit = raw_input('columns: ')
 
+# error check...
+colerrcheck = toedit.split(',')
+if len(toedit) == 0:
+    sys.exit('quitting')
+for i in colerrcheck:
+    if int(i) > len(labelslist):
+        sys.exit('ERROR: oops! there is no colum {0}'.format(i))
+
 # ask what to do with them
 
 coldellist = []
@@ -109,15 +119,36 @@ for i in labels:
 2) edit a text line
 3) delete column'''
             choice = raw_input('choice: ')
+            if choice not in ('1','2','3'):
+                sys.exit('ERROR: Not a valid choice...')
             if choice == '1':
-                print "function to apply, with x for the original value.  IE:  x+2, x-10, or x*5"
-                editsdic[i] = ('arithmetic',raw_input('function: '))
+                print "example line: "
+                print "{0}".format(data[0][labels[i]])
+                print "function to apply, with x for the original value.  IE:  x+2, x-10, x/4, x*5 or x^2    NO NEGATIVE NUMBERS!"
+                funct = raw_input('function: ')   
+                
+                #e rrorcheck
+                if funct[0] != 'x' or funct[1] not in ('=','-','/','*','^','+') or len(funct) < 3:
+                    sys.exit('ERROR: must be in the form of x+2')
+                try:
+                    testval = funct[2:]
+                    testval = int(testval)
+                except ValueError:
+                    sys.exit('ERROR: x{0} WHAT?'.format(funct[1]))
+                editsdic[i] = ('arithmetic',funct)
+            
             if choice == '2':
                 print "example line: "
                 print "{0}".format(data[0][labels[i]])
                 print "write the piece of text to substitute/delete:"
-                textsub = raw_input('text to substitute/delete: ') 
-                editsdic[i] = ('text edit',textsub,raw_input('text to replace it with (or leave blank to delete): '))
+                textsub = raw_input('text to substitute/delete: ')
+                if ' ' in textsub:
+                    sys.exit('ERROR: "{0}" no spaces allowed!'.format(textsub))
+                subtext = raw_input('text to replace it with (or leave blank to delete): ')
+                if ' ' in subtext:
+                    sys.exit('ERROR: "{0}" no spaces allowed!'.format(subtext))
+                editsdic[i] = ('text edit',textsub,subtext)
+            
             if choice == '3':
                 editsdic[i] = ('delete column')
                 coldellist.append(i)
@@ -137,44 +168,40 @@ if doit not in ('Y','y','yes','YES','Yes'):
 
 # DO IT!
 
-lineno = 1
+
+
+
 newdata = []
 counter = 0
 for line in data:
-    print 'working on line {0}'.format(lineno)
     n = 0
     newline = []
     counter +=1
     for i in line:
-        thingtoedit = numtolabel[n]
-        print thingtoedit
-        print editsdic[thingtoedit]
-        
+        thingtoedit = numtolabel[n]        
         if editsdic[thingtoedit][0] == 'arithmetic':
             newline.append(arithmetic(float(i),editsdic[numtolabel[n]][1]))
-
+            
         elif editsdic[thingtoedit][0] == 'text edit':
             newline.append(text_edit(i,editsdic[numtolabel[n]][1],editsdic[numtolabel[n]][2]))
         
         elif editsdic[thingtoedit] == 'NOCHANGE':
             newline.append(i)
-        elif editsdic[thingtoedit] == 'delete column':
-            print 'deleted {0}'.format(thingtoedit)
         n+=1
     newdata.append(newline)
-    lineno+=1
-    if counter == 100:
+    
+    if counter == 1000:
         sys.stdout.write('.')
         sys.stdout.flush()
         counter = 0
-
+ 
 # Write the starfile
-    
+print "writing output file"
 prettydata = make_pretty_numbers(newdata)
 output = open('STAR-edit.star','w')
 
 #write the header if desired
-if headless == True:
+if headless == False:
     n = 1
     if len(coldellist) > 0:
         for i in header:
@@ -189,4 +216,4 @@ if headless == True:
 
 for i in prettydata:
     output.write('{0}\n'.format(i))
-print "wrote output file STAR-edit.star"
+print "\nwrote output file: STAR-edit.star"
