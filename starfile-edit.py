@@ -1,13 +1,13 @@
 #!/usr/bin/python
-##############################################
-### FETCH COPY - (fbsmi2016-04-13 16:15:30.631630) - download a fresh copy if necessary
-##############################################
-
-# AKA starfucker.py
 # edit individual columns in a star file 
-
+# Matt Iadanza - 2016- Astbury Centre for Structural Biology, University of Leeds 
 
 import sys
+vers = '0.2'
+
+if '--headless' is sys.argv:
+    headless = True
+
 
 #------- function test if string is a number --------------------------#
 def is_number(s):
@@ -85,6 +85,7 @@ def text_edit(i,oldtext,newtext):
 #---------------------------------------------------------------------------------------------#
 
    
+# get the headers
 
 (labels,header,data,numtolabel) = read_starfile(sys.argv[1])
 
@@ -95,6 +96,8 @@ for i in labelslist:
 
 print "\nWhich columns to edit? Enter a list separated by commas IE: 1,2,4,6"
 toedit = raw_input('columns: ')
+
+# ask what to do with them
 
 coldellist = []
 editsdic = {}
@@ -121,6 +124,8 @@ for i in labels:
     else:
         editsdic[i] = ('NOCHANGE')
 
+# confirm with the user
+
 print "edits to make: "
 for i in editsdic:
     if editsdic[i] != 'NOCHANGE':
@@ -130,16 +135,21 @@ doit = raw_input("do it (Y/N): ")
 if doit not in ('Y','y','yes','YES','Yes'):
     sys.exit('quitting')
 
+# DO IT!
+
 lineno = 1
 newdata = []
+counter = 0
 for line in data:
     print 'working on line {0}'.format(lineno)
     n = 0
     newline = []
+    counter +=1
     for i in line:
         thingtoedit = numtolabel[n]
         print thingtoedit
         print editsdic[thingtoedit]
+        
         if editsdic[thingtoedit][0] == 'arithmetic':
             newline.append(arithmetic(float(i),editsdic[numtolabel[n]][1]))
 
@@ -153,21 +163,30 @@ for line in data:
         n+=1
     newdata.append(newline)
     lineno+=1
+    if counter == 100:
+        sys.stdout.write('.')
+        sys.stdout.flush()
+        counter = 0
+
+# Write the starfile
     
 prettydata = make_pretty_numbers(newdata)
-
 output = open('STAR-edit.star','w')
 
-print coldellist
-n = 1
-if len(coldellist) > 0:
-    for i in header:
-        if '#' in i:
-            if i.split('#')[0] not in coldellist:
-                output.write('{0}#{1}\n'.format(i.split('#')[0],n))
-                n+=1
-        else:
-            output.write('{0}\n'.format(i))
+#write the header if desired
+if headless == True:
+    n = 1
+    if len(coldellist) > 0:
+        for i in header:
+            if '#' in i:
+                if i.split('#')[0] not in coldellist:
+                    output.write('{0}#{1}\n'.format(i.split('#')[0],n))
+                    n+=1
+            else:
+                output.write('{0}\n'.format(i))
+
+# write the data
+
 for i in prettydata:
     output.write('{0}\n'.format(i))
 print "wrote output file STAR-edit.star"
