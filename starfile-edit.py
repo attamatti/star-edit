@@ -75,6 +75,8 @@ def arithmetic(val,funct):
         return val/float(funct.split(sign)[1])
     if sign == '^':
         return val**float(funct.split(sign)[1])
+    if sign == 'I':
+        return (-1*val*float(funct.split(sign)[1]))
     else:
         sys.exit('arithmetic function some sort of error')
 #----------------------------------------------------------------------------------------------#
@@ -122,31 +124,37 @@ for i in labels:
             if choice not in ('1','2','3'):
                 sys.exit('ERROR: Not a valid choice...')
             if choice == '1':
-                print "example line: "
+                print "\nExample line: "
                 print "{0}".format(data[0][labels[i]])
-                print "function to apply, with x for the original value.  IE:  x+2, x-10, x/4, x*5 or x^2    NO NEGATIVE NUMBERS!"
+                print "function to apply, with x for the original value.  IE:  x+2, x-10, x/4, x*5, or x^2.  \nUse I to multiply by a negative number IE xI1 = x*(-1)"
                 funct = raw_input('function: ')   
                 
-                #e rrorcheck
-                if funct[0] != 'x' or funct[1] not in ('=','-','/','*','^','+') or len(funct) < 3:
-                    sys.exit('ERROR: must be in the form of x+2')
+                #errorchecking...
+                if is_number(data[0][labels[i]]) == False:
+                    sys.exit("ERROR: This column doesn't contain a number")
+                if funct[0] != 'x' or funct[1] not in ('=','-','/','*','^','+','I') or len(funct) < 3:
+                    sys.exit('ERROR: must be in the form of x<sign><number>')
                 try:
                     testval = funct[2:]
-                    testval = int(testval)
+                    testval = float(testval)
                 except ValueError:
-                    sys.exit('ERROR: x{0} WHAT?'.format(funct[1]))
+                    sys.exit('ERROR: x{0}{1} not vaild function'.format(funct[1]),testval)
+                
                 editsdic[i] = ('arithmetic',funct)
             
             if choice == '2':
-                print "example line: "
+                print "\nExample line: "
                 print "{0}".format(data[0][labels[i]])
                 print "write the piece of text to substitute/delete:"
                 textsub = raw_input('text to substitute/delete: ')
+                
+                # error checking... 
                 if ' ' in textsub:
                     sys.exit('ERROR: "{0}" no spaces allowed!'.format(textsub))
                 subtext = raw_input('text to replace it with (or leave blank to delete): ')
                 if ' ' in subtext:
                     sys.exit('ERROR: "{0}" no spaces allowed!'.format(subtext))
+                
                 editsdic[i] = ('text edit',textsub,subtext)
             
             if choice == '3':
