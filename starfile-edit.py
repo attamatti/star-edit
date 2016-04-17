@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# edit individual columns in a star file 
+# Edit individual columns in a star file 
 # Matt Iadanza - 2016- Astbury Centre for Structural Biology, University of Leeds 
 
 import sys
-vers = '0.2'
+vers = '1.0'
 
 headless = False
 if '--headless' is sys.argv:
@@ -89,10 +89,10 @@ def text_edit(i,oldtext,newtext):
 #---------------------------------------------------------------------------------------------#
 
    
-# get the headers
+# get the headers, labels, and data
 
 (labels,header,data,numtolabel) = read_starfile(sys.argv[1])
-
+print '** Easy star file editor vers {0} **'.format(vers)
 print"{0} data columns found".format(len(labels))
 labelslist = range(0,len(labels))
 for i in labelslist:
@@ -101,15 +101,15 @@ for i in labelslist:
 print "\nWhich columns to edit? Enter a list separated by commas IE: 1,2,4,6"
 toedit = raw_input('columns: ')
 
-# error check...
+# error checks
 colerrcheck = toedit.split(',')
 if len(toedit) == 0:
     sys.exit('quitting')
 for i in colerrcheck:
-    if int(i) > len(labelslist):
-        sys.exit('ERROR: Oops! there is no colum {0}'.format(i))
     if is_number(i) == False:
         sys.exit('ERROR: Oops! {0} is not a valid column'.format(i))
+    if int(i) > len(labelslist):
+        sys.exit('ERROR: Oops! there is no colum {0}'.format(i))
 
 # ask what to do with them
 
@@ -126,12 +126,12 @@ for i in labels:
             if choice not in ('1','2','3'):
                 sys.exit('ERROR: Not a valid choice...')
             if choice == '1':
-                print "\nExample line: "
+                print "\nExample value: "
                 print "{0}".format(data[0][labels[i]])
                 print "function to apply, with x for the original value.  IE:  x+2, x-10, x/4, x*5, or x^2.  \nUse I to multiply by a negative number IE xI1 = x*(-1)"
                 funct = raw_input('function: ')   
                 
-                #errorchecking...
+                #error checks
                 if is_number(data[0][labels[i]]) == False:
                     sys.exit("ERROR: This column doesn't contain a number")
                 if funct[0] != 'x' or funct[1] not in ('=','-','/','*','^','+','I') or len(funct) < 3:
@@ -145,12 +145,12 @@ for i in labels:
                 editsdic[i] = ('arithmetic',funct)
             
             if choice == '2':
-                print "\nExample line: "
+                print "\nExample value: "
                 print "{0}".format(data[0][labels[i]])
                 print "write the piece of text to substitute/delete:"
                 textsub = raw_input('text to substitute/delete: ')
                 
-                # error checking... 
+                # error checks 
                 if ' ' in textsub:
                     sys.exit('ERROR: "{0}" no spaces allowed!'.format(textsub))
                 subtext = raw_input('text to replace it with (or leave blank to delete): ')
@@ -178,9 +178,6 @@ if doit not in ('Y','y','yes','YES','Yes'):
 
 # DO IT!
 
-
-
-
 newdata = []
 counter = 0
 for line in data:
@@ -199,7 +196,6 @@ for line in data:
             newline.append(i)
         n+=1
     newdata.append(newline)
-    
     if counter == 1000:
         sys.stdout.write('.')
         sys.stdout.flush()
