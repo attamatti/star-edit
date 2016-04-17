@@ -6,7 +6,7 @@ import sys
 vers = '1.0'
 
 headless = False
-if '--headless' is sys.argv:
+if '--headless' in sys.argv:
     headless = True
 
 
