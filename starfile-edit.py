@@ -5,8 +5,11 @@
 import sys
 vers = '1.0'
 
+if len(sys.argv) < 2:
+    sys.exit('USAGE: star-edit.py <starfile>\nrun with the --headless tag to output without the starfile header')
+
 headless = False
-if '--headless' is sys.argv:
+if '--headless' in sys.argv:
     headless = True
 
 
