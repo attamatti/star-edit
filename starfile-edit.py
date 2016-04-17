@@ -107,7 +107,9 @@ if len(toedit) == 0:
     sys.exit('quitting')
 for i in colerrcheck:
     if int(i) > len(labelslist):
-        sys.exit('ERROR: oops! there is no colum {0}'.format(i))
+        sys.exit('ERROR: Oops! there is no colum {0}'.format(i))
+    if is_number(i) == False:
+        sys.exit('ERROR: Oops! {0} is not a valid column'.format(i))
 
 # ask what to do with them
 
