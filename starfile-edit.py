@@ -5,8 +5,8 @@
 import sys
 vers = '1.0'
 
-if len(sys.argv) < 2:
-    sys.exit('USAGE: star-edit.py <starfile>\nrun with the --headless tag to output without the starfile header')
+if len(sys.argv) < 3:
+    sys.exit('USAGE: star-edit.py <starfile> <output>\nrun with the --headless tag to output without the starfile header')
 
 headless = False
 if '--headless' in sys.argv:
@@ -207,7 +207,7 @@ for line in data:
 # Write the starfile
 print "writing output file"
 prettydata = make_pretty_numbers(newdata)
-output = open('STAR-edit.star','w')
+output = open('{0}'.format(sys.argv[2]),'w')
 
 #write the header if desired
 if headless == False:
@@ -225,4 +225,4 @@ if headless == False:
 
 for i in prettydata:
     output.write('{0}\n'.format(i))
-print "\nwrote output file: STAR-edit.star"
+print "\nwrote output file: {0}".format(sys.argv[2])
