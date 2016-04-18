@@ -1,0 +1,13 @@
+A user friendly utility to edit relion star files.
+Run with:
+star-edit.py <input file> <output file>
+run with the tag --headless to output only the data with out the starfile header - useful for merging two starfiles together.
+
+star-edit.py has three major functions:
+
+1) Arithmetic: perform an arithmetic function on each value in the column.  Useful for binning/unbinning, but other functions are availabale too if you want to get creative.
+2) Text subsitution: Substitute one bit of text for another in every value in the column
+3) Delete column.
+
+Please report bugs to fbsmi@leeds.ac.uk
+2016- Matt Iadanza - Astbury Centre for Structural Molecular Biology, University of Leeds
