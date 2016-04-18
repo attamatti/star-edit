@@ -5,7 +5,7 @@ run with the tag --headless to output only the data with out the starfile header
 
 star-edit.py has three major functions:
 
-1) Arithmetic: perform an arithmetic function on each value in the column.  Useful for binning/unbinning, but other functions are availabale too if you want to get creative.
+1) Arithmetic: perform an arithmetic function on each value in the column.  Useful for binning/unbinning, but other functions are available too if you want to get creative.
 2) Text subsitution: Substitute one bit of text for another in every value in the column
 3) Delete column.
 
