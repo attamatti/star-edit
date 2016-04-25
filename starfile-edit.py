@@ -220,6 +220,9 @@ if headless == False:
                     n+=1
             else:
                 output.write('{0}\n'.format(i))
+    else:
+        for i in header:
+            output.write('{0}\n'.format(i))
 
 # write the data
 
