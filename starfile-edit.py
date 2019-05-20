@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Edit individual columns in a star file 
 # Matt Iadanza - 2016- Astbury Centre for Structural Biology, University of Leeds 
 
@@ -25,6 +25,7 @@ def is_number(s):
 
 ###---------function: read the star file get the header, labels, and data -------------#######
 def read_starfile(f):
+    n2ldic = {}
     inhead = True
     alldata = open(f,'r').readlines()
     labelsdic = {}
@@ -35,6 +36,7 @@ def read_starfile(f):
     for i in alldata:
         if '_rln' in i and '#' in i:
             labelsdic[i.split('#')[0]] = labcount
+            n2ldic[int(i.split('#')[-1])-1] = i.split('#')[0]
             labcount+=1
         if inhead == True:
             header.append(i.strip("\n"))
@@ -44,7 +46,7 @@ def read_starfile(f):
             data.append(i.split())
         count +=1
     
-    return(labelsdic,header,data)
+    return(labelsdic,header,data,n2ldic)
 #---------------------------------------------------------------------------------------------#
 
 #------ function: write all of the numbers in the fortran format ---------------------------#
@@ -100,14 +102,14 @@ def text_edit(i,oldtext,newtext):
 # get the headers, labels, and data
 
 (labels,header,data,numtolabel) = read_starfile(sys.argv[1])
-print '** Easy star file editor vers {0} **'.format(vers)
-print"{0} data columns found".format(len(labels))
+print('** Easy star file editor vers {0} **'.format(vers))
+print("{0} data columns found".format(len(labels)))
 labelslist = range(0,len(labels))
 for i in labelslist:
-    print'{0:>2})  {1}'.format(i,numtolabel[i].replace('_rln',''))
+    print('{0:>2})  {1}'.format(i,numtolabel[i].replace('_rln','')))
 
-print "\nWhich columns to edit? Enter a list separated by commas IE: 1,2,4,6"
-toedit = raw_input('columns: ')
+print("\nWhich columns to edit? Enter a list separated by commas IE: 1,2,4,6")
+toedit = input('columns: ')
 
 # error checks
 colerrcheck = toedit.split(',')
@@ -125,19 +127,19 @@ coldellist = []
 editsdic = {}
 for i in labels:
     if str(labels[i]) in toedit.split(','):
-            print "\n** working on column {0}: {1}**".format(labels[i],i)
-            print '''type of edit to make:
+            print ("\n** working on column {0}: {1}**".format(labels[i],i))
+            print('''type of edit to make:
 1) arithmetic
 2) edit a text line
-3) delete column'''
-            choice = raw_input('choice: ')
+3) delete column''')
+            choice = input('choice: ')
             if choice not in ('1','2','3'):
                 sys.exit('ERROR: Not a valid choice...')
             if choice == '1':
-                print "\nExample value: "
-                print "{0}".format(data[0][labels[i]])
-                print "function to apply, with x for the original value.  IE:  x+2, x-10, x/4, x*5, or x^2.  \nUse I to multiply by a negative number IE xI1 = x*(-1)"
-                funct = raw_input('function: ')   
+                print ("\nExample value: ")
+                print ("{0}".format(data[0][labels[i]]))
+                print ("function to apply, with x for the original value.  IE:  x+2, x-10, x/4, x*5, or x^2.  \nUse I to multiply by a negative number IE xI1 = x*(-1)")
+                funct = input('function: ')   
                 
                 #error checks
                 if is_number(data[0][labels[i]]) == False:
@@ -153,15 +155,15 @@ for i in labels:
                 editsdic[i] = ('arithmetic',funct)
             
             if choice == '2':
-                print "\nExample value: "
-                print "{0}".format(data[0][labels[i]])
-                print "write the piece of text to substitute/delete:"
-                textsub = raw_input('text to substitute/delete: ')
+                print ("\nExample value: ")
+                print ("{0}".format(data[0][labels[i]]))
+                print ("write the piece of text to substitute/delete:")
+                textsub = input('text to substitute/delete: ')
                 
                 # error checks 
                 if ' ' in textsub:
                     sys.exit('ERROR: "{0}" no spaces allowed!'.format(textsub))
-                subtext = raw_input('text to replace it with (or leave blank to delete): ')
+                subtext = input('text to replace it with (or leave blank to delete): ')
                 if ' ' in subtext:
                     sys.exit('ERROR: "{0}" no spaces allowed!'.format(subtext))
                 
@@ -175,12 +177,12 @@ for i in labels:
 
 # confirm with the user
 
-print "edits to make: "
+print ("edits to make: ")
 for i in editsdic:
     if editsdic[i] != 'NOCHANGE':
-        print '{0}\t\t{1}'.format(i,editsdic[i])
+        print ('{0}\t\t{1}'.format(i,editsdic[i]))
 
-doit = raw_input("do it (Y/N): ")
+doit = input("do it (Y/N): ")
 if doit not in ('Y','y','yes','YES','Yes'):
     sys.exit('quitting')
 
@@ -210,7 +212,7 @@ for line in data:
         counter = 0
  
 # Write the starfile
-print "writing output file"
+print ("writing output file")
 prettydata = make_pretty_numbers(newdata)
 output = open('{0}'.format(sys.argv[2]),'w')
 
@@ -233,4 +235,4 @@ if headless == False:
 
 for i in prettydata:
     output.write('{0}\n'.format(i))
-print "\nwrote output file: {0}".format(sys.argv[2])
+print ("\nwrote output file: {0}".format(sys.argv[2]))
